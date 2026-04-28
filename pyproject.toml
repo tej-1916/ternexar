@@ -1,0 +1,19 @@
+[project]
+name = "ternexar"
+version = "0.1.0"
+description = "A premium, terminal-native AI command center."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "typer[all]",
+    "rich",
+    "toml",
+    "requests",
+]
+
+[project.scripts]
+tx = "ternexar.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
