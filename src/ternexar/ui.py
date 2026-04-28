@@ -59,7 +59,7 @@ class UI:
             self.console.print(text)
 
         self.console.print(
-            "[dim]local-first AI command center • Ollama-ready • v0.2[/]\n"
+            "[dim]local-first AI command center • Ollama-ready • v0.3[/]\n"
         )
 
     def panel(
@@ -78,12 +78,22 @@ class UI:
         )
         self.console.print(panel)
 
-    def ai_response(self, content: str, model: str):
+    def warning_panel(self, message: str, title: str = "SAFETY WARNING"):
+        """Render a high-visibility warning panel for risky actions."""
+        panel = Panel(
+            Text.from_markup(f"[bold yellow]{message}[/]"),
+            title=f"[bold red]{title}[/]",
+            border_style="orange_red1",
+            padding=(1, 2),
+        )
+        self.console.print(panel)
+
+    def ai_response(self, content: str, model: str, title: str = "TERNEXAR"):
         """Render AI generated content as Markdown in a branded panel."""
         md = Markdown(content)
         panel = Panel(
             md,
-            title=f"[brand]TERNEXAR[/]",
+            title=f"[brand]{title}[/]",
             subtitle=f"[dim]model: {model}[/]",
             border_style=CYAN,
             padding=(1, 2),

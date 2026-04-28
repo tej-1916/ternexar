@@ -1,3 +1,4 @@
+from ternexar import __version__
 from ternexar.ui import ui
 from ternexar.config import config_manager
 from ternexar.health import health_checker, StatusResult
@@ -50,7 +51,7 @@ class BootSequence:
         # Final Status Panel
         all_success = all(r.success for r in results if not getattr(r, 'skipped', False))
         if all_success:
-            ui.panel(f"[bold green]SYSTEM READY[/]\nTERNEXAR v0.2 is active and connected.", title="READY", style="green")
+            ui.panel(f"[bold green]SYSTEM READY[/]\nTERNEXAR v{__version__} is active and connected.", title="READY", style="green")
             ui.hint("type [bold cyan]tx --help[/] to explore")
         else:
             # Find the first failure to show fix command

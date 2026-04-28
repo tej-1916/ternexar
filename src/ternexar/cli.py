@@ -2,6 +2,7 @@ import typer
 
 from ternexar import __version__
 from ternexar.ask import handle_ask
+from ternexar.plan import handle_plan
 from ternexar.boot import boot_sequence
 from ternexar.config import CONFIG_FILE, config_manager
 from ternexar.ui import ui
@@ -41,6 +42,18 @@ def ask(
 ):
     """Ask TERNEXAR a question using the local AI model."""
     handle_ask(prompt, model_override=model, temperature_override=temperature)
+
+
+@app.command()
+def plan(
+    task: str = typer.Argument(..., help="The task you want to generate a plan for."),
+    model: str = typer.Option(None, "--model", "-m", help="Override default model."),
+    temperature: float = typer.Option(
+        None, "--temp", "-t", help="Override default temperature."
+    ),
+):
+    """Generate a safe terminal action plan for a specific task."""
+    handle_plan(task, model_override=model, temperature_override=temperature)
 
 
 @app.command()
