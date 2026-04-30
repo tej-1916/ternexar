@@ -7,6 +7,7 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.status import Status
 from rich.text import Text
+from rich.table import Table
 from rich.theme import Theme
 
 PURPLE = "#8A2BE2"
@@ -137,6 +138,42 @@ class UI:
         self.console.print(
             Panel(toml.dumps(config_data), title="Config", border_style=CYAN)
         )
+
+    def render_risk_report(self, analysis):
+        """Render a detailed command risk analysis report."""
+        self.console.print(f"\n[brand]COMMAND RISK ANALYSIS[/]")
+        
+        # Command Panel
+        self.console.print(Panel(
+            Text(analysis.command, style="bold white"),
+            title="Command",
+            border_style=CYAN,
+            padding=(0, 1)
+        ))
+
+        # Risk Summary
+        level_color = analysis.level.color
+        self.console.print(f"Risk Level: [{level_color}]{analysis.level.value}[/]")
+        self.console.print(f"Policy: [dim]{analysis.policy}[/]\n")
+
+        if analysis.matches:
+            table = Table(show_header=True, header_style=f"bold {PURPLE}", box=None)
+            table.add_column("Pattern", style="cyan")
+            table.add_column("Reason", style="white")
+            table.add_column("Alternative", style="dim green")
+
+            for match in analysis.matches:
+                table.add_row(
+                    match.label,
+                    match.reason,
+                    match.alternative or "N/A"
+                )
+            
+            self.console.print(table)
+        else:
+            self.console.print("[success]No known risky patterns detected.[/]")
+        
+        self.console.print("\n")
 
 
 ui = UI()

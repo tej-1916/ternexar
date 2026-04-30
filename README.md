@@ -1,42 +1,67 @@
 # TERNEXAR
 
-A premium, terminal-native AI command center for the local-first era.
+**Safe, local-first terminal intelligence.**
+
+TERNEXAR is a command-line interface designed to bridge the gap between local LLMs and terminal automation. It focuses on a high-integrity workflow: understanding a task, planning the steps, and assessing the risk—all before a single character is typed into your shell.
+
+## Safety & Philosophy
+
+TERNEXAR operates on a strict **Ask → Plan → Risk** pipeline. We believe terminal automation should be transparent and verifiable. 
+
+**Note:** TERNEXAR currently analyzes and plans but **does not execute** commands. Execution features are slated for future releases and will always require explicit user confirmation.
 
 ## Features
 
-- **v0.3: Planning Mode** - Generate structured terminal action plans with deterministic safety scanning.
-- **v0.2: Local AI Inference** - Direct communication with Ollama.
-- **v0.2: Ask Anything** - One-shot questions using `tx ask`.
-- **v0.1: The Foundation** - Environment health checks (Ollama, Config, Models), CLI routing, and Rich-based UI.
+*   **v0.4: Risk Engine** – A deterministic, rule-based system that classifies command risk levels (Low, Medium, High, Critical) using local safety heuristics.
+*   **v0.3: Plan Mode** – Generates structured, multi-step terminal action plans using local Ollama models.
+*   **v0.2: Ask Mode** – One-shot technical questions and command lookups via `tx ask`.
+*   **v0.1: The Foundation** – Environment diagnostics (`tx doctor`), local configuration management, and a high-fidelity terminal UI.
 
 ## Installation
 
+Ensure you have [Ollama](https://ollama.ai/) installed and running locally.
+
 ```bash
+# Clone the repository and install in editable mode
 pip install -e .
 ```
 
 ## Usage
 
-### Ask Command
-
+### Ask
+Query local models for quick answers or command syntax.
 ```bash
-tx ask "Explain recursion in one sentence."
+tx ask "How do I list all files larger than 100MB in the current directory?"
 ```
 
-### Plan Command
-
+### Plan
+Transform a natural language goal into a structured sequence of commands.
 ```bash
-tx plan "install docker and run a hello-world container"
+tx plan "Set up a local postgres container with a persistent volume"
 ```
 
-Options:
-- `--model, -m`: Override default model.
-- `--temp, -t`: Override default temperature (0.0 to 1.0).
-
-### Diagnostic & Config
-
+### Risk
+Analyze the generated plan using the deterministic risk engine. This identifies potentially destructive commands (like `rm -rf` or `mkfs`) before they are staged.
 ```bash
-tx doctor         # Deep diagnostic of your local environment
-tx config view    # View current settings
-tx config path    # Show config file location
+tx risk
 ```
+
+### Diagnostics
+```bash
+tx doctor         # Validate local environment and Ollama connectivity
+tx config view    # Inspect active configuration
+tx config path    # Locate configuration files
+```
+
+## Project Status
+
+TERNEXAR is currently in **v0.4 (Beta)**. 
+- All LLM interactions are handled locally via Ollama.
+- The Risk Engine is entirely local and rule-based; it does not use LLMs to assess safety.
+- **No commands are executed by the tool.**
+
+## Future Direction
+The next phase of development focuses on the **Execute** module, which will provide a secure "apply" workflow for approved plans, featuring dry-runs and granular confirmation prompts.
+
+---
+*Built for the local-first era.*

@@ -3,6 +3,7 @@ import typer
 from ternexar import __version__
 from ternexar.ask import handle_ask
 from ternexar.plan import handle_plan
+from ternexar.risk import risk_engine
 from ternexar.boot import boot_sequence
 from ternexar.config import CONFIG_FILE, config_manager
 from ternexar.ui import ui
@@ -54,6 +55,15 @@ def plan(
 ):
     """Generate a safe terminal action plan for a specific task."""
     handle_plan(task, model_override=model, temperature_override=temperature)
+
+
+@app.command()
+def risk(
+    command: str = typer.Argument(..., help="The shell command to analyze for risk.")
+):
+    """Classify the risk level of a specific shell command."""
+    analysis = risk_engine.analyze(command)
+    ui.render_risk_report(analysis)
 
 
 @app.command()
