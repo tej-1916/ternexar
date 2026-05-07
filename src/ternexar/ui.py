@@ -60,7 +60,7 @@ class UI:
             self.console.print(text)
 
         self.console.print(
-            "[dim]local-first AI command center • Ollama-ready • v0.9[/]\n"
+            "[dim]local-first AI command center • Ollama-ready • v1.0[/]\n"
         )
 
     def render_execution_result(self, command: str, stdout: str, stderr: str, exit_code: int):
@@ -304,10 +304,10 @@ class UI:
             "REFUSED": "bold blink red"
         }.get(result.mode, "white")
 
-        # Update wording for LOW as per v0.8 requirements
+        # Update wording for LOW as per v1.0 requirements
         future_behavior = result.future_behavior
         if result.risk_level.value == "LOW":
-            future_behavior = "Eligible for future execution with visible/auditable minimal confirmation."
+            future_behavior = "Eligible for execution with visible/auditable minimal confirmation."
 
         self.console.print(Panel(
             Text(future_behavior, style=interaction_style),
@@ -399,7 +399,7 @@ class UI:
         self.console.print("\n[dim blink]DRY RUN ONLY - NO COMMANDS EXECUTED[/]\n")
 
     def render_preview_report(self, task: str, actions):
-        """Render the TERNEXAR v0.5 Preview report."""
+        """Render the TERNEXAR v1.0 Preview report."""
         self.console.print("\n" + "=" * 80)
         self.console.print(Align.center("[bold blink red]DRY RUN ONLY - NO COMMANDS EXECUTED[/]"))
         self.console.print("=" * 80 + "\n")

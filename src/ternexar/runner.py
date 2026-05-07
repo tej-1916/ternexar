@@ -25,7 +25,7 @@ class RunnerSkeleton:
         gate_result = gate_engine.evaluate(command)
         confirm_result = confirm_engine.evaluate(command)
         
-        # Mapping logic as per v0.8 requirements
+        # Mapping logic as per v1.0 requirements
         if (gate_result.risk_level == RiskLevel.LOW and 
             gate_result.gate_decision == GateStatus.PASS and 
             confirm_result.mode == ConfirmationMode.MINIMAL_CONFIRMATION.value):

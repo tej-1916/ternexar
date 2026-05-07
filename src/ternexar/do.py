@@ -61,7 +61,7 @@ def handle_do(command: str):
     if gate_result.risk_level != RiskLevel.LOW:
         log_refusal(
             command, 
-            f"Only LOW risk commands are executable in v0.9. Risk detected: {gate_result.risk_level.value}",
+            f"Only LOW risk commands are executable in v1.0. Risk detected: {gate_result.risk_level.value}",
             gate_result,
             confirm_result
         )
@@ -79,7 +79,7 @@ def handle_do(command: str):
     if confirm_result.mode != ConfirmationMode.MINIMAL_CONFIRMATION.value:
         log_refusal(
             command, 
-            f"Command requires elevated confirmation ({confirm_result.mode}), which is not supported in v0.9.",
+            f"Command requires elevated confirmation ({confirm_result.mode}), which is not supported in v1.0.",
             gate_result,
             confirm_result
         )
@@ -89,7 +89,7 @@ def handle_do(command: str):
     if not is_in_allowlist(command):
         log_refusal(
             command, 
-            "Command is not in the strict v0.9 allowlist.",
+            "Command is not in the strict v1.0 allowlist.",
             gate_result,
             confirm_result
         )
