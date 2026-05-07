@@ -60,8 +60,54 @@ class UI:
             self.console.print(text)
 
         self.console.print(
-            "[dim]local-first AI command center • Ollama-ready • v0.3[/]\n"
+            "[dim]local-first AI command center • Ollama-ready • v0.9[/]\n"
         )
+
+    def render_execution_result(self, command: str, stdout: str, stderr: str, exit_code: int):
+        """Render the results of a command execution."""
+        self.console.print(f"\n[brand]EXECUTION RESULT[/]")
+        
+        # Command Panel
+        self.console.print(Panel(
+            Text(command, style="bold white"),
+            title="Command",
+            border_style=CYAN,
+            padding=(0, 1)
+        ))
+
+        if stdout:
+            self.console.print(Panel(
+                Text(stdout.strip()),
+                title="STDOUT",
+                border_style="green",
+                padding=(0, 1)
+            ))
+
+        if stderr:
+            self.console.print(Panel(
+                Text(stderr.strip(), style="bold red"),
+                title="STDERR",
+                border_style="red",
+                padding=(0, 1)
+            ))
+
+        status_style = "bold green" if exit_code == 0 else "bold red"
+        self.console.print(f"Exit Status: [{status_style}]EXITCODE {exit_code}[/]\n")
+
+    def render_refusal(self, command: str, reason: str):
+        """Render a high-visibility refusal message."""
+        self.console.print(f"\n[bold red]EXECUTION REFUSED[/]")
+        self.console.print(Panel(
+            Text(command, style="bold white"),
+            title="Command",
+            border_style="red",
+            padding=(0, 1)
+        ))
+        self.console.print(f"[error]Reason:[/] {reason}\n")
+
+    def render_minimal_confirmation(self, command: str):
+        """Show a minimal confirmation message before execution."""
+        self.console.print(f"[info]Executing LOW-risk command:[/] [bold white]{command}[/]")
 
     def panel(
         self,

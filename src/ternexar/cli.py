@@ -10,6 +10,7 @@ from ternexar.risk import risk_engine
 from ternexar.boot import boot_sequence
 from ternexar.config import CONFIG_FILE, config_manager
 from ternexar.audit import audit_manager
+from ternexar.do import handle_do
 from ternexar.runner import runner_skeleton
 from ternexar.ui import ui
 
@@ -75,6 +76,14 @@ def preview(
 ):
     """Dry-run preview of what TERNEXAR would do for a specific task."""
     handle_preview(task, model_override=model, temperature_override=temperature)
+
+
+@app.command()
+def do(
+    command: str = typer.Argument(..., help="The shell command to execute safely (LOW risk only).")
+):
+    """Execute a safe, allowlisted shell command after safety validation."""
+    handle_do(command)
 
 
 @app.command()

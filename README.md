@@ -6,12 +6,11 @@ TERNEXAR is a command-line interface designed to bridge the gap between local LL
 
 ## Safety & Philosophy
 
-TERNEXAR operates on a strict **Ask → Plan → Risk** pipeline. We believe terminal automation should be transparent and verifiable. 
-
-**Note:** TERNEXAR currently analyzes and plans but **does not execute** commands. Execution features are slated for future releases and will always require explicit user confirmation.
+TERNEXAR operates on a strict **Ask → Plan → Risk → Execute** pipeline. We believe terminal automation should be transparent and verifiable. 
 
 ## Features
 
+*   **v0.9: The Execution Bridge** – Safely execute real-world LOW-risk commands from a strict allowlist. Features include `subprocess` integration (shell=False), timeout protection, and automated pre/post execution audit logging.
 *   **v0.8: Audit & Runner Simulation** – Complete observability for safety decisions. Simulate the full execution pipeline with `tx runner-check` and view detailed safety logs with `tx audit`.
 *   **v0.7: Confirmation Protocol** – Defined how future execution would request confirmation based on risk and policy.
 *   **v0.6: Execution Policy Gate** – Established deterministic PASS/HOLD/BLOCK logic for all staged commands.
@@ -50,6 +49,13 @@ Dry-run a task to see exactly which commands would be staged, their risk levels,
 tx preview "Install docker and run hello-world"
 ```
 
+### Do
+Safely execute a LOW-risk, allowlisted command after safety validation.
+```bash
+tx do "ls -la"
+tx do "git status"
+```
+
 ### Risk
 Analyze the generated plan using the deterministic risk engine. This identifies potentially destructive commands (like `rm -rf` or `mkfs`) before they are staged.
 ```bash
@@ -77,23 +83,13 @@ tx config path    # Locate configuration files
 
 ## Project Status
 
-TERNEXAR is currently in **v0.6 (Beta)**. 
+TERNEXAR is currently in **v0.9 (Beta)**. 
 - All LLM interactions are handled locally via Ollama.
 - The Risk Engine is entirely local and rule-based; it does not use LLMs to assess safety.
-- **No commands are executed by the tool.**
+- **Execution is limited to LOW-risk, allowlisted commands.**
 
 ## Future Direction
-The next phase of development focuses on the **Execute** module, which will provide a secure "apply" workflow for approved plans, featuring dry-runs and granular confirmation prompts.
+The next phase of development focuses on the **Interactive Execution** module, which will provide secure confirmation prompts for MEDIUM and HIGH risk commands.
 
 ---
 *Built for the local-first era.*
-secure "apply" workflow for approved plans, featuring dry-runs and granular confirmation prompts.
-
----
-*Built for the local-first era.*
-l-first era.*
-ompts.
-
----
-*Built for the local-first era.*
-l-first era.*

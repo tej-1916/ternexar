@@ -1,0 +1,152 @@
+import shlex
+import subprocess
+from ternexar.risk import RiskLevel, risk_engine
+from ternexar.gate import gate_engine, GateStatus
+from ternexar.confirm import confirm_engine, ConfirmationMode
+from ternexar.audit import audit_manager
+from ternexar.ui import ui
+
+STRICT_ALLOWLIST = [
+    "ls",
+    "pwd",
+    "git status",
+    "python --version",
+    "python3 --version",
+    "whoami",
+    "date"
+]
+
+FORBIDDEN_CHARS = [";", "&&", "||", "|", ">", ">>", "<", "`", "$("]
+
+def is_in_allowlist(command: str) -> bool:
+    """Check if the command starts with an allowlisted base command."""
+    # Special handling for multi-word allowlist items like 'git status'
+    for allowed in STRICT_ALLOWLIST:
+        if command == allowed or command.startswith(f"{allowed} "):
+            return True
+    return False
+
+def contains_forbidden_elements(command: str) -> bool:
+    """Check for shell metacharacters or forbidden chaining."""
+    for char in FORBIDDEN_CHARS:
+        if char in command:
+            return True
+    return False
+
+def log_refusal(command: str, reason: str, gate_result=None, confirm_result=None):
+    """Log a refused execution attempt to the audit log."""
+    audit_manager.log_event(
+        command=command,
+        risk_level=gate_result.risk_level.value if gate_result else "UNKNOWN",
+        gate_decision=gate_result.gate_decision.value if gate_result else "BLOCK",
+        policy=gate_result.policy.value if gate_result else "DENY",
+        confirmation_mode=confirm_result.mode if confirm_result else "REFUSED",
+        action_type="EXECUTION_REFUSED",
+        result="REFUSED",
+        notes=reason
+    )
+    ui.render_refusal(command, reason)
+
+def handle_do(command: str):
+    """Safely execute a LOW-risk, allowlisted command."""
+    # 1. Structural checks
+    if contains_forbidden_elements(command):
+        log_refusal(command, "Command contains forbidden shell characters or chaining (e.g., |, &&, ;, >).")
+        return
+
+    # 2. Pipeline checks
+    gate_result = gate_engine.evaluate(command)
+    confirm_result = confirm_engine.evaluate(command)
+
+    if gate_result.risk_level != RiskLevel.LOW:
+        log_refusal(
+            command, 
+            f"Only LOW risk commands are executable in v0.9. Risk detected: {gate_result.risk_level.value}",
+            gate_result,
+            confirm_result
+        )
+        return
+
+    if gate_result.gate_decision != GateStatus.PASS:
+        log_refusal(
+            command, 
+            f"Command failed the execution gate. Status: {gate_result.gate_decision.value}",
+            gate_result,
+            confirm_result
+        )
+        return
+
+    if confirm_result.mode != ConfirmationMode.MINIMAL_CONFIRMATION.value:
+        log_refusal(
+            command, 
+            f"Command requires elevated confirmation ({confirm_result.mode}), which is not supported in v0.9.",
+            gate_result,
+            confirm_result
+        )
+        return
+
+    # 3. Allowlist check
+    if not is_in_allowlist(command):
+        log_refusal(
+            command, 
+            "Command is not in the strict v0.9 allowlist.",
+            gate_result,
+            confirm_result
+        )
+        return
+
+    # 4. Pre-execution Audit
+    audit_manager.log_event(
+        command=command,
+        risk_level=gate_result.risk_level.value,
+        gate_decision=gate_result.gate_decision.value,
+        policy=gate_result.policy.value,
+        confirmation_mode=confirm_result.mode,
+        action_type="EXECUTION_START",
+        result="STARTED",
+        notes="Passing through safety pipeline."
+    )
+
+    # 6. Execution
+    ui.render_minimal_confirmation(command)
+    
+    try:
+        args = shlex.split(command)
+        result = subprocess.run(
+            args,
+            shell=False,
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        
+        exit_code = result.returncode
+        stdout = result.stdout
+        stderr = result.stderr
+        execution_status = "SUCCESS" if exit_code == 0 else "FAILED"
+
+    except subprocess.TimeoutExpired:
+        exit_code = -1
+        stdout = ""
+        stderr = "Error: Command timed out after 10 seconds."
+        execution_status = "TIMEOUT"
+    except Exception as e:
+        exit_code = -1
+        stdout = ""
+        stderr = f"Error: {str(e)}"
+        execution_status = "ERROR"
+
+    # 7. Post-execution Audit
+    audit_manager.log_event(
+        command=command,
+        risk_level=gate_result.risk_level.value,
+        gate_decision=gate_result.gate_decision.value,
+        policy=gate_result.policy.value,
+        confirmation_mode=confirm_result.mode,
+        action_type="EXECUTION_END",
+        result=execution_status,
+        notes=f"Exit code: {exit_code}"
+    )
+
+    # 8. UI Result
+    ui.render_execution_result(command, stdout, stderr, exit_code)
