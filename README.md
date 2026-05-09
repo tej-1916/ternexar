@@ -73,6 +73,12 @@ tx workspace add "~/my-projects"
 tx workspace list
 ```
 
+### `tx setup-preview`
+Analyze a project folder and generate a safe setup preview.
+```bash
+tx setup-preview "/home/teju/ternexar"
+```
+
 ### `tx analyze`
 Analyze a broken Python app or error and suggest safe patches.
 ```bash
@@ -140,6 +146,21 @@ tx preview "Install docker and run hello-world"
 ## Safety Features
 
 *   **Risk Engine:** Classifies commands into `LOW`, `MEDIUM`, `HIGH`, and `BLOCKED`.
+*   **Execution Gate:** Maps risk levels to strict policies (PASS, HOLD, BLOCK).
+*   **No-Shell Execution:** Uses `subprocess.run(shell=False)` to prevent shell-injection.
+*   **Timeout Protection:** Prevents runaway commands from hanging your terminal.
+
+## Documentation
+- [LICENSE](LICENSE)
+- [SECURITY.md](SECURITY.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [CHANGELOG.md](CHANGELOG.md)
+- [ROADMAP.md](ROADMAP.md)
+- [Safety Demonstration](examples/safety_demo.md)
+
+---
+*Built for the local-first era.*
+assifies commands into `LOW`, `MEDIUM`, `HIGH`, and `BLOCKED`.
 *   **Execution Gate:** Maps risk levels to strict policies (PASS, HOLD, BLOCK).
 *   **No-Shell Execution:** Uses `subprocess.run(shell=False)` to prevent shell-injection.
 *   **Timeout Protection:** Prevents runaway commands from hanging your terminal.

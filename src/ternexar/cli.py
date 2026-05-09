@@ -15,6 +15,7 @@ from ternexar.analyze import handle_analyze
 from ternexar.operator import handle_operator
 from ternexar.locator import locator
 from ternexar.workspace import workspace_manager
+from ternexar.setup_assistant import setup_assistant
 from ternexar.runner import runner_skeleton
 from ternexar.workspace_config import workspace_config
 from ternexar.ui import ui
@@ -81,6 +82,15 @@ def scan(
     """Read safe metadata and detect project type and dependencies."""
     scan_data = workspace_manager.scan(path)
     ui.render_scan_report(scan_data)
+
+
+@app.command(name="setup-preview")
+def setup_preview(
+    path: str = typer.Argument(".", help="The path to the project to preview setup for.")
+):
+    """Analyze a project folder and generate a safe setup preview."""
+    setup_data = setup_assistant.get_preview(path)
+    ui.render_setup_preview(setup_data)
 
 
 @workspace_app.command("add")

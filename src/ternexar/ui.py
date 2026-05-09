@@ -621,6 +621,64 @@ class UI:
         
         self.console.print("\n")
 
+    def render_setup_preview(self, setup_data: dict):
+        """Render a high-fidelity project setup preview report."""
+        self.console.print(f"\n[brand]SETUP ASSISTANT[/]")
+        
+        if "error" in setup_data:
+            self.error(setup_data["error"])
+            return
+
+        # Project Summary
+        type_color = {
+            "PYTHON": "bold blue",
+            "NODE": "bold green",
+            "RUST": "bold orange1",
+            "GO": "bold cyan",
+            "JAVA": "bold red",
+            "STATIC_WEB": "bold yellow"
+        }.get(setup_data["project_type"], "white")
+
+        self.console.print(f"Project: [bold white]{setup_data['path']}[/]")
+        self.console.print(f"Type: [{type_color}]{setup_data['project_type']}[/]")
+        self.console.print(f"Files: [dim]{', '.join(setup_data['important_files'])}[/]\n")
+
+        self.console.print("=" * 60)
+        self.console.print(Align.center("[bold red]SETUP PREVIEW ONLY - NO COMMANDS EXECUTED[/]"))
+        self.console.print("=" * 60 + "\n")
+
+        table = Table(show_header=True, header_style=f"bold {PURPLE}", box=None, padding=(0, 1))
+        table.add_column("Command", style="bold white")
+        table.add_column("Risk", width=10)
+        table.add_column("Gate", width=10)
+        table.add_column("Status", width=20)
+
+        for step in setup_data["steps"]:
+            risk_color = {
+                "LOW": "green",
+                "MEDIUM": "yellow",
+                "HIGH": "bold red",
+                "BLOCKED": "bold red",
+                "INFO": "dim cyan"
+            }.get(step["risk_level"], "white")
+
+            status_color = {
+                "PREVIEW_ONLY": "bold blue",
+                "SHELL_INSTRUCTION": "dim white",
+                "RECOMMENDATION": "green"
+            }.get(step["status"], "white")
+
+            table.add_row(
+                step["command"],
+                f"[{risk_color}]{step['risk_level']}[/]",
+                step["gate_decision"],
+                f"[{status_color}]{step['status']}[/]"
+            )
+
+        self.console.print(table)
+        self.console.print("\n[dim]Use 'tx risk <command>' to see detailed safety analysis.[/]")
+        self.console.print("[dim]Use 'tx view <path>' to explore project structure safely.[/]\n")
+
     def render_workspace_list(self, roots: list):
         """Render the list of custom workspace roots."""
         from pathlib import Path
