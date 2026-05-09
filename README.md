@@ -1,8 +1,26 @@
-# TERNEXAR (v1.4.0)
+# TERNEXAR (v1.6.0)
 
 **A stable, high-integrity terminal safety operator.**
 
 TERNEXAR is a command-line interface designed to bridge the gap between local LLMs and terminal automation. It provides a deterministic safety layer that ensures terminal AI remains helpful, transparent, and—above all—safe.
+
+## v1.6: Natural Command Routing
+
+Release v1.6 introduces a seamless natural language interface to TERNEXAR's safety-first pipeline.
+
+- **Natural Operator Routing:** The `tx operator` now understands natural requests like "setup this project", "scan my web project", or "fix import error".
+- **Deterministic Intent Mapping:** Safely routes requests to existing components (Locator, Workspace Viewer, Setup Assistant, Safe Fix Mode).
+- **Target Extraction:** Automatically identifies project names and paths from natural text.
+- **Install Request Safety:** Intercepts system installation requests (e.g., "install python") and provides clear, preview-only feedback without execution.
+- **Transparent Feedback:** Shows detected intent, routed action, and safety decisions in real-time.
+
+## v1.5: Safe Setup Assistant
+
+Release v1.5 introduces a proactive project setup preview system.
+
+- **Setup Preview:** Analyzes projects and generates safe setup instructions (`tx setup-preview`).
+- **No-Execution Guarantee:** Displays what commands *would* run without actually executing them.
+- **Project Intelligence:** Detects Python, Node, Rust, and Go project structures.
 
 ## Safety & Philosophy
 
@@ -104,11 +122,12 @@ tx scan "/home/teju/ternexar"
 ```
 
 ### `tx operator`
-Enter the interactive Operator Composer.
+Enter the interactive Operator Composer for natural language orchestration.
 ```bash
 tx operator
-> explain @README.md
-> install codex
+> setup this project
+> scan my ternexar project
+> fix ModuleNotFoundError: No module named requests
 > ls -la
 ```
 

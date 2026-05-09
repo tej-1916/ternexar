@@ -60,18 +60,32 @@ class UI:
             self.console.print(text)
 
         self.console.print(
-            "[dim]local-first AI command center • Ollama-ready • v1.1[/]\n"
+            "[dim]local-first AI command center • Ollama-ready • v1.6[/]\n"
         )
+
+    def render_operator_routing_feedback(self, intent: str, route: str, safety: str):
+        """Render transparent routing feedback for the operator."""
+        self.console.print(f"\n[brand]OPERATOR ROUTE[/]")
+        grid = Table.grid(expand=True)
+        grid.add_column(style="dim cyan", width=15)
+        grid.add_column(style="bold white")
+
+        grid.add_row("Intent:", intent)
+        grid.add_row("Route:", route)
+        grid.add_row("Safety:", f"[bold green]{safety}[/]")
+        
+        self.console.print(Panel(grid, border_style=CYAN, padding=(0, 1)))
+
 
     def operator_welcome(self):
         """Render the Operator Mode welcome panel."""
         self.splash()
         self.panel(
-            "[bold green]LOW-only execution[/] • [bold cyan]@file read-only[/] • [bold white]safety-first[/]",
+            "[bold green]LOW-only execution[/] • [bold cyan]@file read-only[/] • [bold white]safety-first[/]\n"
+            "[dim]Exit: Ctrl+D or exit[/]",
             title="[brand]TERNEXAR OPERATOR[/]",
             style=CYAN
         )
-        self.console.print("\n")
 
     def render_operator_exit(self):
         """Render a clean exit message for the operator."""

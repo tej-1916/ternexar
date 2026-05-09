@@ -1,8 +1,11 @@
 import sys
-from prompt_toolkit import PromptSession
-from prompt_toolkit.formatted_text import HTML
+from prompt_toolkit.application import Application
+from prompt_toolkit.layout import Layout, HSplit, Window
+from prompt_toolkit.widgets import TextArea
+from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.styles import Style
 from prompt_toolkit.patch_stdout import patch_stdout
+from prompt_toolkit.formatted_text import HTML
 
 from ternexar.router import router, Intent
 from ternexar.do import handle_do
@@ -10,24 +13,49 @@ from ternexar.ask import handle_ask
 from ternexar.plan import handle_plan
 from ternexar.preview import handle_preview
 from ternexar.locator import locator
+from ternexar.setup_assistant import setup_assistant
+from ternexar.workspace import workspace_manager
+from ternexar.analyze import handle_analyze
+from prompt_toolkit.layout.processors import Processor, Transformation
+from prompt_toolkit.layout.utils import explode_text_fragments
+
 from ternexar.ui import ui
 
 OPERATOR_STYLE = Style.from_dict({
-    "default": "bg:#2b2b2b #ffffff",
-    "prompt": "#00FFFF bold",
-    "placeholder": "#666666 italic",
-    "bottom-toolbar": "bg:#1e1e1e #888888",
-    "bottom-toolbar.safety": "#00ff00 bold",
-    "bottom-toolbar.context": "#00FFFF",
-    "bottom-toolbar.exit": "#ff5555",
+    "composer-bar": "bg:#2b2b2b #ffffff",
+    "prompt": "bg:#2b2b2b #00FFFF bold",
+    "placeholder": "bg:#2b2b2b #666666 italic",
 })
 
-def bottom_toolbar():
-    return HTML(
-        ' Safety: <style class="bottom-toolbar.safety">LOW-only</style> | '
-        'Context: <style class="bottom-toolbar.context">@file enabled</style> | '
-        'Exit: <style class="bottom-toolbar.exit">Ctrl+D or exit</style> '
-    )
+class PlaceholderProcessor(Processor):
+    """Custom processor to display placeholder text when the buffer is empty."""
+    def __init__(self, placeholder_text: str):
+        self.placeholder_text = placeholder_text
+
+    def apply_transformation(self, transformation_input):
+        if not transformation_input.document.text:
+            return Transformation(explode_text_fragments([("class:placeholder", self.placeholder_text)]))
+        return Transformation(transformation_input.fragments)
+
+def _handle_named_project(text: str, intent_label: str):
+    """Helper to resolve a target project and return its path if possible."""
+    target = router.extract_target(text)
+    if not target or target == ".":
+        return "."
+
+    results = locator.locate(target)
+    if not results:
+        ui.warning(f"No projects found matching '{target}'.")
+        ui.hint("Try adding a workspace root: [bold white]tx workspace add <path>[/]")
+        return None
+    
+    if len(results) > 1:
+        ui.render_operator_locate_results(target, results)
+        return None
+        
+    res = results[0]
+    ui.info(f"Target identified: [bold white]{res['name']}[/] [dim]({res['path']})[/]")
+    return res["path"]
 
 def route_operator_input(text: str):
     """Main routing logic for operator input."""
@@ -53,31 +81,52 @@ def route_operator_input(text: str):
     # 3. Route to handler
     try:
         if intent == Intent.DO:
-            ui.info(f"Routing to [success]EXECUTION[/]...")
+            ui.render_operator_routing_feedback("DO", f"tx do {text}", "LOW-only execution")
             handle_do(text)
         elif intent == Intent.ASK:
-            ui.info(f"Routing to [info]ASK[/]...")
+            ui.render_operator_routing_feedback("ASK", "AI Assistant", "Consulting local model")
             handle_ask(full_prompt)
         elif intent == Intent.PLAN:
-            ui.info(f"Routing to [brand]PLAN[/]...")
+            ui.render_operator_routing_feedback("PLAN", "Task Planner", "Generating terminal strategy")
             handle_plan(full_prompt)
         elif intent == Intent.PREVIEW:
-            ui.info(f"Routing to [warning]PREVIEW[/]...")
+            ui.render_operator_routing_feedback("PREVIEW", "Action Preview", "Dry-run only")
             handle_preview(full_prompt)
         elif intent == Intent.LOCATE:
-            ui.info(f"Routing to [brand]LOCATOR[/]...")
-            # Extract query: remove keywords like 'find', 'locate', 'my', 'project', etc.
-            query = text.lower()
-            for kw in ["find", "locate", "where", "is", "my", "project", "show", "files", "in", "search"]:
-                query = query.replace(kw, "").strip()
-            
+            query = router.extract_target(text) or text
+            ui.render_operator_routing_feedback("LOCATE", f"tx locate {query}", "Searching safe roots")
             results = locator.locate(query)
             ui.render_operator_locate_results(query, results)
+        elif intent == Intent.SETUP:
+            path = _handle_named_project(text, "SETUP")
+            if path:
+                ui.render_operator_routing_feedback("SETUP_PREVIEW", f"tx setup-preview {path}", "Preview only")
+                setup_data = setup_assistant.get_preview(path)
+                ui.render_setup_preview(setup_data)
+        elif intent == Intent.SCAN:
+            path = _handle_named_project(text, "SCAN")
+            if path:
+                ui.render_operator_routing_feedback("SCAN", f"tx scan {path}", "Workspace intelligence")
+                scan_data = workspace_manager.scan(path)
+                ui.render_scan_report(scan_data)
+        elif intent == Intent.VIEW:
+            path = _handle_named_project(text, "VIEW")
+            if path:
+                ui.render_operator_routing_feedback("VIEW", f"tx view {path}", "Read-only tree")
+                tree_data = workspace_manager.get_tree(path)
+                ui.render_workspace_tree(path, tree_data)
+        elif intent == Intent.ANALYZE:
+            ui.render_operator_routing_feedback("ANALYZE", f"tx analyze \"{text}\"", "Safe fix mode")
+            handle_analyze(text)
+        elif intent == Intent.INSTALL_REQUEST:
+            ui.render_operator_routing_feedback("INSTALL_REQUEST", "REFUSED", "Not enabled in v1.6")
+            ui.warning("Install execution is not enabled in v1.6. This request can be previewed only.")
+            ui.info("No commands executed.")
         elif intent == Intent.REFUSE:
             ui.render_refusal(text, "Dangerous command or blocked pattern detected.")
         else:
             ui.info("Unknown input. Try a question, task, or safe command.")
-            ui.hint("Examples: 'ls -la', 'what is recursion?', 'explain @README.md'")
+            ui.hint("Examples: 'setup this project', 'scan my ternexar project', 'fix import error'")
     except SystemExit:
         # Typer/SysExit might be raised by handlers; we want to stay in the loop
         pass
@@ -85,26 +134,57 @@ def route_operator_input(text: str):
         ui.error(f"Routing error: {str(e)}")
 
 def handle_operator():
-    """Starts the interactive TERNEXAR Operator session."""
+    """Starts the interactive TERNEXAR Operator session with a modern, taller composer UI."""
     ui.operator_welcome()
     
-    # In-memory session history only for v1.1
-    session = PromptSession(
-        message=HTML("<prompt>&gt;</prompt> "),
-        style=OPERATOR_STYLE,
-        bottom_toolbar=bottom_toolbar,
-    )
+    kb = KeyBindings()
+
+    @kb.add("enter")
+    def _(event):
+        text = event.app.current_buffer.text
+        event.app.exit(result=text)
+
+    @kb.add("c-c")
+    def _(event):
+        event.app.current_buffer.text = ""
+
+    @kb.add("c-d")
+    def _(event):
+        event.app.exit(exception=EOFError)
 
     while True:
         try:
+            # Create a 3-row tall, vertically centered composer block
+            text_area = TextArea(
+                prompt="> ",
+                multiline=False,
+                style="class:composer-bar",
+                input_processors=[PlaceholderProcessor("Type your message or @path/to/file")],
+            )
+            
+            # Use HSplit to add padding above and below the input line
+            # All elements share the composer-bar style for a unified dark gray block
+            composer_layout = HSplit([
+                Window(height=1, char=" ", style="class:composer-bar"),
+                text_area,
+                Window(height=1, char=" ", style="class:composer-bar"),
+            ])
+            
+            app = Application(
+                layout=Layout(composer_layout),
+                style=OPERATOR_STYLE,
+                key_bindings=kb,
+                full_screen=False,
+            )
+            
             with patch_stdout():
-                user_input = session.prompt(placeholder="Type your message or @path/to/file")
+                user_input = app.run()
                 
             if user_input:
                 route_operator_input(user_input)
                 
         except KeyboardInterrupt:
-            # Ctrl+C clears the line, doesn't exit the loop
+            # Ctrl+C clears the line via key binding, but we catch it here too
             continue
         except EOFError:
             # Ctrl+D exits

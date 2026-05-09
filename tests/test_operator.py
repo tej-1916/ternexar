@@ -14,11 +14,15 @@ def test_intent_classification_ask():
     assert router.classify_intent("Explain recursion") == Intent.ASK
     assert router.classify_intent("Tell me a joke?") == Intent.ASK
 
-def test_intent_classification_preview():
-    assert router.classify_intent("install requests") == Intent.PREVIEW
-    assert router.classify_intent("npm install rich") == Intent.PREVIEW
-    assert router.classify_intent("pip install .") == Intent.PREVIEW
-    assert router.classify_intent("setup project") == Intent.PREVIEW
+def test_intent_classification_setup():
+    assert router.classify_intent("setup this project") == Intent.SETUP
+    assert router.classify_intent("prepare this project") == Intent.SETUP
+    assert router.classify_intent("install dependencies for this project") == Intent.SETUP
+
+def test_intent_classification_install_request():
+    assert router.classify_intent("install python 3") == Intent.INSTALL_REQUEST
+    assert router.classify_intent("install nodejs") == Intent.INSTALL_REQUEST
+    assert router.classify_intent("install claude code") == Intent.INSTALL_REQUEST
 
 def test_intent_classification_refuse():
     assert router.classify_intent("rm -rf /") == Intent.REFUSE

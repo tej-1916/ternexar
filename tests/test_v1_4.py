@@ -58,7 +58,9 @@ def test_router_locate_intent(router):
     assert router.classify_intent("find my project") == Intent.LOCATE
     assert router.classify_intent("where is my website") == Intent.LOCATE
     assert router.classify_intent("locate ternexar") == Intent.LOCATE
-    assert router.classify_intent("show files in car-rental") == Intent.LOCATE
+
+def test_router_view_intent(router):
+    assert router.classify_intent("show files in car-rental") == Intent.VIEW
 
 def test_router_not_locate_intent(router):
     assert router.classify_intent("what is a project?") == Intent.ASK
