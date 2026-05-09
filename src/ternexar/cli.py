@@ -11,6 +11,7 @@ from ternexar.boot import boot_sequence
 from ternexar.config import CONFIG_FILE, config_manager
 from ternexar.audit import audit_manager
 from ternexar.do import handle_do
+from ternexar.operator import handle_operator
 from ternexar.runner import runner_skeleton
 from ternexar.ui import ui
 
@@ -40,6 +41,12 @@ def main(
     """Run the standard boot sequence and health check."""
     if ctx.invoked_subcommand is None:
         boot_sequence.run(show_splash=not no_splash)
+
+
+@app.command()
+def operator():
+    """Enter the interactive TERNEXAR Operator Composer."""
+    handle_operator()
 
 
 @app.command()

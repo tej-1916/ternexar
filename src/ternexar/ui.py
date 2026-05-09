@@ -60,8 +60,22 @@ class UI:
             self.console.print(text)
 
         self.console.print(
-            "[dim]local-first AI command center • Ollama-ready • v1.0[/]\n"
+            "[dim]local-first AI command center • Ollama-ready • v1.1[/]\n"
         )
+
+    def operator_welcome(self):
+        """Render the Operator Mode welcome panel."""
+        self.splash()
+        self.panel(
+            "[bold green]LOW-only execution[/] • [bold cyan]@file read-only[/] • [bold white]safety-first[/]",
+            title="[brand]TERNEXAR OPERATOR[/]",
+            style=CYAN
+        )
+        self.console.print("\n")
+
+    def render_operator_exit(self):
+        """Render a clean exit message for the operator."""
+        self.console.print(f"\n[brand]TERNEXAR[/] session closed. [dim]Stay safe.[/]\n")
 
     def render_execution_result(self, command: str, stdout: str, stderr: str, exit_code: int):
         """Render the results of a command execution."""
