@@ -9,6 +9,7 @@ from ternexar.do import handle_do
 from ternexar.ask import handle_ask
 from ternexar.plan import handle_plan
 from ternexar.preview import handle_preview
+from ternexar.locator import locator
 from ternexar.ui import ui
 
 OPERATOR_STYLE = Style.from_dict({
@@ -63,6 +64,15 @@ def route_operator_input(text: str):
         elif intent == Intent.PREVIEW:
             ui.info(f"Routing to [warning]PREVIEW[/]...")
             handle_preview(full_prompt)
+        elif intent == Intent.LOCATE:
+            ui.info(f"Routing to [brand]LOCATOR[/]...")
+            # Extract query: remove keywords like 'find', 'locate', 'my', 'project', etc.
+            query = text.lower()
+            for kw in ["find", "locate", "where", "is", "my", "project", "show", "files", "in", "search"]:
+                query = query.replace(kw, "").strip()
+            
+            results = locator.locate(query)
+            ui.render_operator_locate_results(query, results)
         elif intent == Intent.REFUSE:
             ui.render_refusal(text, "Dangerous command or blocked pattern detected.")
         else:

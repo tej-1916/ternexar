@@ -12,6 +12,9 @@ DEFAULT_CONFIG = {
     },
     "ui": {
         "show_splash": True
+    },
+    "workspaces": {
+        "roots": []
     }
 }
 
@@ -32,7 +35,14 @@ class ConfigManager:
         
         try:
             with open(CONFIG_FILE, "r") as f:
-                self._config = toml.load(f)
+                file_config = toml.load(f)
+                # Merge file config with DEFAULT_CONFIG to handle missing keys
+                self._config = DEFAULT_CONFIG.copy()
+                for section, values in file_config.items():
+                    if section in self._config:
+                        self._config[section].update(values)
+                    else:
+                        self._config[section] = values
         except Exception:
             self._config = DEFAULT_CONFIG
         

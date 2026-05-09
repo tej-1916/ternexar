@@ -16,6 +16,7 @@ from ternexar.operator import handle_operator
 from ternexar.locator import locator
 from ternexar.workspace import workspace_manager
 from ternexar.runner import runner_skeleton
+from ternexar.workspace_config import workspace_config
 from ternexar.ui import ui
 
 app = typer.Typer(
@@ -27,6 +28,9 @@ app = typer.Typer(
 
 config_app = typer.Typer(help="Manage TERNEXAR configuration.")
 app.add_typer(config_app, name="config")
+
+workspace_app = typer.Typer(help="Manage custom workspace roots.")
+app.add_typer(workspace_app, name="workspace")
 
 audit_app = typer.Typer(help="Manage and view TERNEXAR safety audit logs.")
 app.add_typer(audit_app, name="audit")
@@ -77,6 +81,41 @@ def scan(
     """Read safe metadata and detect project type and dependencies."""
     scan_data = workspace_manager.scan(path)
     ui.render_scan_report(scan_data)
+
+
+@workspace_app.command("add")
+def workspace_add(
+    path: str = typer.Argument(..., help="The path to add as a custom workspace root.")
+):
+    """Add a custom workspace root to search for projects."""
+    success, message = workspace_config.add_root(path)
+    ui.render_workspace_add_result(success, message)
+
+
+@workspace_app.command("list")
+def workspace_list():
+    """Show configured custom workspace roots."""
+    roots = workspace_config.get_roots()
+    ui.render_workspace_list(roots)
+
+
+@workspace_app.command("remove")
+def workspace_remove(
+    path: str = typer.Argument(..., help="The path to remove from workspace roots.")
+):
+    """Remove a custom workspace root from configuration."""
+    success, message = workspace_config.remove_root(path)
+    ui.render_workspace_remove_result(success, message)
+
+
+@workspace_app.command("clear")
+def workspace_clear():
+    """Clear all custom workspace roots."""
+    if typer.confirm("Clear all workspace roots?", default=False):
+        workspace_config.clear_roots()
+        ui.success("Workspace roots cleared.")
+    else:
+        ui.info("Operation cancelled.")
 
 
 @app.command()

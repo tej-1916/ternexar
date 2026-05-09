@@ -621,5 +621,64 @@ class UI:
         
         self.console.print("\n")
 
+    def render_workspace_list(self, roots: list):
+        """Render the list of custom workspace roots."""
+        from pathlib import Path
+        self.console.print(f"\n[brand]WORKSPACE ROOTS[/]")
+        
+        if not roots:
+            self.console.print("[dim]No custom workspace roots configured.[/]\n")
+            return
+
+        table = Table(show_header=True, header_style=f"bold {PURPLE}", box=None, padding=(0, 2))
+        table.add_column("Root Path", style="bold white")
+        table.add_column("Status", style="cyan")
+        table.add_column("Safety", style="dim")
+
+        for r in roots:
+            path = Path(r)
+            status = "[green]Exists[/]" if path.exists() else "[red]Missing[/]"
+            table.add_row(r, status, "Safe/Config Only")
+
+        self.console.print(table)
+        self.console.print("\n[dim]These roots are used by 'tx locate' to find projects.[/]\n")
+
+    def render_workspace_add_result(self, success: bool, message: str):
+        """Render the result of adding a workspace root."""
+        if success:
+            self.console.print(f"\n[success]SUCCESS:[/] Added workspace root: [bold white]{message}[/]")
+            self.console.print("[dim]TERNEXAR will now search this directory during 'tx locate'.[/]\n")
+        else:
+            self.console.print(f"\n[error]REFUSED:[/] {message}")
+            self.console.print("[dim]Path was not added to TERNEXAR configuration.[/]\n")
+
+    def render_workspace_remove_result(self, success: bool, message: str):
+        """Render the result of removing a workspace root."""
+        if success:
+            self.console.print(f"[success]SUCCESS:[/] Removed workspace root: {message}")
+        else:
+            self.console.print(f"[error]ERROR:[/] {message}")
+
+    def render_operator_locate_results(self, query: str, results: list):
+        """Render integrated operator locate results with suggestions."""
+        if not results:
+            self.console.print(f"\n[yellow]I couldn't find any projects matching '{query}'.[/]")
+            self.console.print("[dim]Try adding a workspace root: [/][bold white]tx workspace add <path>[/]")
+            return
+
+        self.console.print(f"\n[brand]LOCATOR[/] Found [bold white]{len(results)}[/] matches for '[info]{query}[/]':")
+        
+        for i, res in enumerate(results, 1):
+            self.console.print(f"  {i}. [bold white]{res['name']}[/] [dim]({res['path']})[/]")
+
+        if len(results) == 1:
+            res = results[0]
+            self.console.print(f"\n[success]Match identified.[/] What would you like to do?")
+            self.console.print(f"  • [bold cyan]scan my {res['name']} project[/]")
+            self.console.print(f"  • [bold cyan]show files in {res['name']}[/]")
+        else:
+            self.console.print(f"\n[info]Multiple matches found.[/] Please be more specific or use [bold white]tx view <path>[/].")
+        self.console.print("")
+
 
 ui = UI()

@@ -17,6 +17,7 @@ class Intent(Enum):
     ASK = "ASK"
     PLAN = "PLAN"
     PREVIEW = "PREVIEW"
+    LOCATE = "LOCATE"
     REFUSE = "REFUSE"
     UNKNOWN = "UNKNOWN"
 
@@ -24,6 +25,7 @@ class Router:
     def __init__(self):
         self.question_starters = {"what", "how", "explain", "why", "who", "where", "when", "can", "is", "are"}
         self.install_keywords = {"install", "setup", "build", "npm", "pip", "cargo", "yarn", "brew", "apt"}
+        self.locate_keywords = {"find", "locate", "where", "search", "show project", "show files"}
 
     def classify_intent(self, text: str) -> Intent:
         """Classify user intent based on heuristics and safety checks."""
@@ -36,20 +38,26 @@ class Router:
         if analysis.level in [RiskLevel.HIGH, RiskLevel.BLOCKED]:
             return Intent.REFUSE
 
-        # 2. Check for raw LOW allowlisted command
+        # 2. Check for locate keywords
+        if any(clean_text.startswith(kw) for kw in self.locate_keywords):
+            return Intent.LOCATE
+        if "my" in clean_text and "project" in clean_text:
+            return Intent.LOCATE
+
+        # 3. Check for raw LOW allowlisted command
         if is_in_allowlist(text):
             return Intent.DO
 
-        # 3. Check for install/setup keywords (route to PREVIEW)
+        # 4. Check for install/setup keywords (route to PREVIEW)
         if any(keyword in clean_text for keyword in self.install_keywords):
             return Intent.PREVIEW
 
-        # 4. Check for questions
+        # 5. Check for questions
         first_word = clean_text.split()[0] if clean_text.split() else ""
         if first_word in self.question_starters or clean_text.endswith("?"):
             return Intent.ASK
 
-        # 5. Default to PLAN for general tasks
+        # 6. Default to PLAN for general tasks
         return Intent.PLAN
 
     def resolve_context(self, text: str) -> Tuple[str, List[str]]:
