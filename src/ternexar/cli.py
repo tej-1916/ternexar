@@ -19,6 +19,7 @@ from ternexar.setup_assistant import setup_assistant
 from ternexar.runner import runner_skeleton
 from ternexar.workspace_config import workspace_config
 from ternexar.installer_profiles import profile_registry, ProfileStatus, handle_install_preview
+from ternexar.version_check import handle_version_check
 from ternexar.ui import ui
 
 app = typer.Typer(
@@ -100,6 +101,14 @@ def install_preview(
 ):
     """Preview deterministic installation steps for a supported tool."""
     handle_install_preview(tool)
+
+
+@app.command(name="version-check")
+def version_check(
+    tool: str = typer.Argument(..., help="The tool name to check version for (e.g., 'python3').")
+):
+    """Safely check if a tool is installed and report its version."""
+    handle_version_check(tool)
 
 
 @workspace_app.command("add")

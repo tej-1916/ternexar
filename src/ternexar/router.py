@@ -22,6 +22,7 @@ class Intent(Enum):
     SCAN = "SCAN"
     VIEW = "VIEW"
     ANALYZE = "ANALYZE"
+    VERSION_CHECK = "VERSION_CHECK"
     INSTALL_REQUEST = "INSTALL_REQUEST"
     REFUSE = "REFUSE"
     UNKNOWN = "UNKNOWN"
@@ -30,6 +31,7 @@ class Router:
     def __init__(self):
         self.question_starters = {"what", "how", "explain", "why", "who", "where", "when", "can", "is", "are"}
         self.system_install_keywords = {"install python", "install node", "install docker", "install claude", "install codex", "install rust", "install go", "install java"}
+        self.version_check_keywords = {"version", "installed?", "is installed", "is node installed", "is python installed", "is npm installed"}
         self.setup_keywords = {"setup", "prepare", "install dependencies", "run this project"}
         self.locate_keywords = {"find", "locate", "where is", "where is my", "search"}
         self.scan_keywords = {"scan", "inspect", "project type", "analyze project structure"}
@@ -51,7 +53,13 @@ class Router:
         if any(kw in clean_text for kw in self.system_install_keywords):
             return Intent.INSTALL_REQUEST
         
-        # 3. Setup/Dependency Project Request
+        # 3. Version Check Request
+        if any(kw in clean_text for kw in self.version_check_keywords):
+            # Special case: "install python" should be INSTALL_REQUEST, not VERSION_CHECK
+            if "install " not in clean_text:
+                return Intent.VERSION_CHECK
+
+        # 4. Setup/Dependency Project Request
         if any(kw in clean_text for kw in self.setup_keywords):
             return Intent.SETUP
 
@@ -98,6 +106,27 @@ class Router:
             # Basic cleanup: remove trailing fluff like "for me", "please", etc.
             tool = re.sub(r"\s+(for me|please|now|on my system)$", "", tool)
             return tool
+        return None
+
+    def extract_version_check_tool(self, text: str) -> Optional[str]:
+        """Extract a likely tool name from a version check request."""
+        clean_text = text.lower().strip()
+        
+        # "check <tool> version"
+        match = re.search(r"check\s+([\w\s\.\-3]+)\s+version", clean_text)
+        if match:
+            return match.group(1).strip()
+            
+        # "is <tool> installed"
+        match = re.search(r"is\s+([\w\s\.\-3]+)\s+installed", clean_text)
+        if match:
+            return match.group(1).strip()
+            
+        # "<tool> version"
+        match = re.search(r"^([\w\s\.\-3]+)\s+version$", clean_text)
+        if match:
+            return match.group(1).strip()
+            
         return None
 
     def extract_target(self, text: str) -> Optional[str]:

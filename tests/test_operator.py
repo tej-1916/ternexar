@@ -6,8 +6,8 @@ from ternexar.router import router, Intent
 def test_intent_classification_do():
     assert router.classify_intent("ls") == Intent.DO
     assert router.classify_intent("git status") == Intent.DO
-    assert router.classify_intent("python --version") == Intent.DO
-
+    # python --version is now VERSION_CHECK
+    assert router.classify_intent("python --version") == Intent.VERSION_CHECK
 def test_intent_classification_ask():
     assert router.classify_intent("What is Python?") == Intent.ASK
     assert router.classify_intent("How do I use git?") == Intent.ASK

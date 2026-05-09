@@ -1,8 +1,19 @@
-# TERNEXAR (v1.7.0)
+# TERNEXAR (v1.8.0)
 
 **A stable, high-integrity terminal safety operator.**
 
 TERNEXAR is a command-line interface designed to bridge the gap between local LLMs and terminal automation. It provides a deterministic safety layer that ensures terminal AI remains helpful, transparent, and—above all—safe.
+
+## v1.8: Installer Version Check
+
+Release v1.8 introduces a safe, deterministic way to check if trusted tools are installed and report their versions.
+
+- **Safe Version Check:** Verify the presence and version of tools like `python3`, `node`, and `npm` (`tx version-check`).
+- **Deterministic Verification:** Uses hardcoded, non-destructive commands (e.g., `python3 --version`) from verified profiles.
+- **Safety Pipeline Integration:** Every version check command is automatically evaluated by TERNEXAR's Risk, Gate, and Confirmation engines.
+- **No-Install Guarantee:** Explicitly refuses to execute any installation commands, ensuring system integrity.
+- **Operator Integration:** Natural requests like "is node installed?" or "check python version" are automatically routed to the safe version-check interface.
+- **Audit Logging:** Every check is recorded in the local safety audit log.
 
 ## v1.7: Installer Profiles Preview
 
@@ -111,6 +122,12 @@ tx setup-preview "/home/teju/ternexar"
 Preview deterministic installation steps for a supported tool.
 ```bash
 tx install-preview "python3"
+```
+
+### `tx version-check`
+Safely check if a tool is installed and report its version.
+```bash
+tx version-check "python3"
 ```
 
 ### `tx analyze`

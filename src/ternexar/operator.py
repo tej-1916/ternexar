@@ -17,6 +17,7 @@ from ternexar.setup_assistant import setup_assistant
 from ternexar.workspace import workspace_manager
 from ternexar.analyze import handle_analyze
 from ternexar.installer_profiles import handle_install_preview
+from ternexar.version_check import handle_version_check
 from prompt_toolkit.layout.processors import Processor, Transformation
 from prompt_toolkit.layout.utils import explode_text_fragments
 
@@ -119,6 +120,10 @@ def route_operator_input(text: str):
         elif intent == Intent.ANALYZE:
             ui.render_operator_routing_feedback("ANALYZE", f"tx analyze \"{text}\"", "Safe fix mode")
             handle_analyze(text)
+        elif intent == Intent.VERSION_CHECK:
+            tool = router.extract_version_check_tool(text) or "unknown"
+            ui.render_operator_routing_feedback("VERSION_CHECK", f"tx version-check {tool}", "Version check only")
+            handle_version_check(tool)
         elif intent == Intent.INSTALL_REQUEST:
             tool = router.extract_tool_name(text) or "unknown"
             ui.render_operator_routing_feedback("INSTALL_REQUEST", f"tx install-preview {tool}", "Preview only")

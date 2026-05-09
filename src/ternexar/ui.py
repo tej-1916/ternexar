@@ -751,6 +751,45 @@ class UI:
         
         self.console.print(f"\n[dim]Note: Future TERNEXAR v2.0 will enable confirmed execution for verified profiles.[/]\n")
 
+    def render_version_check_result(self, data: dict):
+        """Render the results of a version check."""
+        self.console.print(f"\n[brand]VERSION CHECK[/]")
+        
+        table = Table(show_header=False, box=None, padding=(0, 2))
+        table.add_column("Key", style="dim cyan")
+        table.add_column("Value")
+
+        status_value = data["status"].value if hasattr(data["status"], "value") else data["status"]
+        status_color = {
+            "INSTALLED": "bold green",
+            "NOT_INSTALLED": "bold yellow",
+            "NEEDS_VERIFICATION": "bold cyan",
+            "UNKNOWN_TOOL": "bold red",
+            "CHECK_FAILED": "bold red",
+            "REFUSED": "bold red"
+        }.get(status_value, "white")
+
+        table.add_row("Tool Requested", data["requested_tool"])
+        table.add_row("Normalized Tool", f"[bold white]{data['normalized_tool']}[/]")
+        table.add_row("Status", f"[{status_color}]{status_value}[/]")
+        
+        if data.get("executable"):
+            table.add_row("Executable", data["executable"])
+        if data.get("command"):
+            table.add_row("Check Command", f"[dim]{data['command']}[/]")
+        if data.get("version_output"):
+            table.add_row("Version Output", f"[bold white]{data['version_output']}[/]")
+        
+        self.console.print(Panel(table, border_style=CYAN))
+
+        if data.get("notes"):
+            self.console.print(f"[dim]Notes: {data['notes']}[/]")
+
+        # Safety Disclaimer
+        self.console.print("\n" + "=" * 60)
+        self.console.print(Align.center("[bold red]VERSION CHECK ONLY - NO INSTALL COMMANDS EXECUTED[/]"))
+        self.console.print("=" * 60 + "\n")
+
     def render_workspace_list(self, roots: list):
         """Render the list of custom workspace roots."""
         from pathlib import Path
