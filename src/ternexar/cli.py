@@ -11,6 +11,7 @@ from ternexar.boot import boot_sequence
 from ternexar.config import CONFIG_FILE, config_manager
 from ternexar.audit import audit_manager
 from ternexar.do import handle_do
+from ternexar.analyze import handle_analyze
 from ternexar.operator import handle_operator
 from ternexar.runner import runner_skeleton
 from ternexar.ui import ui
@@ -47,6 +48,14 @@ def main(
 def operator():
     """Enter the interactive TERNEXAR Operator Composer."""
     handle_operator()
+
+
+@app.command()
+def analyze(
+    task: str = typer.Argument(..., help="The task or error message to analyze and fix safely.")
+):
+    """Analyze a broken Python app or error and suggest safe patches."""
+    handle_analyze(task)
 
 
 @app.command()

@@ -197,6 +197,81 @@ class UI:
     def hint(self, message: str):
         self.console.print(f"\n[dim]Hint: {message}[/]")
 
+    def render_analysis_result(self, result):
+        """Render the results of an issue analysis."""
+        self.console.print(f"\n[brand]TERNEXAR ANALYZER[/]")
+        
+        # Detection Panel
+        self.console.print(Panel(
+            Text.from_markup(result.detected_issue or "No issue detected."),
+            title="Detection",
+            border_style=CYAN,
+            padding=(0, 1)
+        ))
+
+        if result.explanation:
+            self.console.print(Panel(
+                Text(result.explanation),
+                title="Explanation",
+                border_style="dim white",
+                padding=(0, 1)
+            ))
+
+        # Safety Verdict
+        verdict_color = {
+            "SAFE": "bold green",
+            "BLOCKED": "bold red",
+            "REFUSED": "bold yellow"
+        }.get(result.safety_verdict, "white")
+        
+        self.console.print(f"Safety Verdict: [{verdict_color}]{result.safety_verdict}[/]")
+        if result.reason:
+            self.console.print(f"[dim]Reason: {result.reason}[/]")
+        
+        if result.diff:
+            self.render_diff_preview(result.diff)
+
+    def render_diff_preview(self, diff: str):
+        """Render a unified diff with color highlighting."""
+        self.console.print(f"\n[brand]PROPOSED PATCH[/]")
+        
+        diff_lines = diff.splitlines()
+        styled_diff = Text()
+        
+        for line in diff_lines:
+            if line.startswith("+"):
+                styled_diff.append(line + "\n", style="green")
+            elif line.startswith("-"):
+                styled_diff.append(line + "\n", style="red")
+            elif line.startswith("@@"):
+                styled_diff.append(line + "\n", style="cyan")
+            else:
+                styled_diff.append(line + "\n", style="white")
+
+        self.console.print(Panel(
+            styled_diff,
+            title="Unified Diff",
+            border_style="dim white",
+            padding=(0, 1)
+        ))
+
+    def render_patch_applied(self, result):
+        """Render a success message after applying a patch."""
+        self.console.print(f"\n[success]✔ Patch applied successfully.[/]")
+        if result.file_path:
+            self.console.print(f"Modified: [bold white]{result.file_path}[/]")
+        if result.backup_path:
+            self.console.print(f"Backup: [dim]{result.backup_path}[/]")
+        self.console.print("\n")
+
+    def render_patch_cancelled(self):
+        """Render a cancellation message."""
+        self.console.print(f"\n[info]Patch cancelled. No files were modified.[/]\n")
+
+    def render_patch_failed(self, error: str):
+        """Render a failure message for patching."""
+        self.console.print(f"\n[error]FAILED:[/] {error}\n")
+
     def config_view(self, config_data: dict):
         self.console.print(
             Panel(toml.dumps(config_data), title="Config", border_style=CYAN)
