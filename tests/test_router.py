@@ -13,6 +13,11 @@ def test_classify_intent_install_request(router):
     assert router.classify_intent("install python 3") == Intent.INSTALL_REQUEST
     assert router.classify_intent("install claude code") == Intent.INSTALL_REQUEST
     assert router.classify_intent("install nodejs") == Intent.INSTALL_REQUEST
+    assert router.classify_intent("install tree") == Intent.INSTALL_REQUEST
+    assert router.classify_intent("install java") == Intent.INSTALL_REQUEST
+    assert router.classify_intent("please install nmap") == Intent.INSTALL_REQUEST
+    assert router.classify_intent("can you install python 3") == Intent.INSTALL_REQUEST
+    assert router.classify_intent("install randomtool") == Intent.INSTALL_REQUEST
 
 def test_classify_intent_setup(router):
     assert router.classify_intent("setup this project") == Intent.SETUP
@@ -47,6 +52,14 @@ def test_classify_intent_do(router):
 def test_classify_intent_ask(router):
     assert router.classify_intent("what is recursion?") == Intent.ASK
     assert router.classify_intent("how do I use git?") == Intent.ASK
+
+def test_extract_tool_name(router):
+    assert router.extract_tool_name("install python 3") == "python 3"
+    assert router.extract_tool_name("install nmap") == "nmap"
+    assert router.extract_tool_name("please install tree") == "tree"
+    assert router.extract_tool_name("can you install java") == "java"
+    assert router.extract_tool_name("install nmap please") == "nmap"
+    assert router.extract_tool_name("install node for me") == "node"
 
 def test_extract_target(router):
     assert router.extract_target("setup this project") == "."

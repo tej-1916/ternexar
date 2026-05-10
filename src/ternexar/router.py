@@ -31,7 +31,6 @@ class Intent(Enum):
 class Router:
     def __init__(self):
         self.question_starters = {"what", "how", "explain", "why", "who", "where", "when", "can", "is", "are"}
-        self.system_install_keywords = {"install python", "install node", "install nmap", "install docker", "install claude", "install codex", "install rust", "install go", "install java"}
         self.preflight_keywords = {"preflight", "install readiness", "ready to install", "ready for install"}
         self.version_check_keywords = {"version", "installed?", "is installed", "is node installed", "is python installed", "is npm installed", "is nmap installed"}
         self.setup_keywords = {"setup", "prepare", "install dependencies", "run this project"}
@@ -56,8 +55,11 @@ class Router:
             return Intent.INSTALL_PREFLIGHT
 
         # 3. Installer/System Install Request
-        if any(kw in clean_text for kw in self.system_install_keywords):
-            return Intent.INSTALL_REQUEST
+        if "install " in clean_text:
+            # Avoid misclassifying SETUP or PREFLIGHT requests
+            if not any(kw in clean_text for kw in self.setup_keywords) and \
+               not any(kw in clean_text for kw in self.preflight_keywords):
+                return Intent.INSTALL_REQUEST
         
         # 4. Version Check Request
         if any(kw in clean_text for kw in self.version_check_keywords):
