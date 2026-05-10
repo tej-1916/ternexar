@@ -31,9 +31,9 @@ class Intent(Enum):
 class Router:
     def __init__(self):
         self.question_starters = {"what", "how", "explain", "why", "who", "where", "when", "can", "is", "are"}
-        self.system_install_keywords = {"install python", "install node", "install docker", "install claude", "install codex", "install rust", "install go", "install java"}
+        self.system_install_keywords = {"install python", "install node", "install nmap", "install docker", "install claude", "install codex", "install rust", "install go", "install java"}
         self.preflight_keywords = {"preflight", "install readiness", "ready to install", "ready for install"}
-        self.version_check_keywords = {"version", "installed?", "is installed", "is node installed", "is python installed", "is npm installed"}
+        self.version_check_keywords = {"version", "installed?", "is installed", "is node installed", "is python installed", "is npm installed", "is nmap installed"}
         self.setup_keywords = {"setup", "prepare", "install dependencies", "run this project"}
         self.locate_keywords = {"find", "locate", "where is", "where is my", "search"}
         self.scan_keywords = {"scan", "inspect", "project type", "analyze project structure"}

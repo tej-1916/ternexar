@@ -1,8 +1,19 @@
-# TERNEXAR (v1.9.0)
+# TERNEXAR (v2.0.0)
 
 **A stable, high-integrity terminal safety operator.**
 
 TERNEXAR is a command-line interface designed to bridge the gap between local LLMs and terminal automation. It provides a deterministic safety layer that ensures terminal AI remains helpful, transparent, and—above all—safe.
+
+## v2.0: Confirmed Installer Execution
+
+Release v2.0 introduces **Confirmed Installer Execution**, allowing TERNEXAR to safely execute verified installer profiles for common development tools under strict safety constraints.
+
+- **Verified Profile Execution:** Execute trusted installer profiles for tools like `python3` and `nodejs` on supported systems.
+- **Two-Step Strong Confirmation:** Mandatory two-step confirmation (boolean choice + exact string match) for all high-risk installations.
+- **Subprocess Safety Model:** Strict use of `shell=False`, list arguments, and no shell metacharacters for execution.
+- **Mandatory Preflight Gate:** Installations only proceed if `tx install-preflight` issues a `READY_FOR_FUTURE_CONFIRMED_EXECUTION` verdict.
+- **Post-Install Verification:** Automatically verifies the installed version after the execution sequence finishes.
+- **Audit Compliance:** Detailed logging of every phase (Request, Preflight, Confirmation, Execution, Verification).
 
 ## v1.9: Installer Preflight
 
@@ -115,6 +126,12 @@ pip install -e .
 ```
 
 ## Core Commands
+
+### `tx install`
+Execute a verified installer profile after preflight and strong confirmation.
+```bash
+tx install "python3"
+```
 
 ### `tx workspace`
 Manage custom workspace roots (add, list, remove, clear).

@@ -21,6 +21,7 @@ from ternexar.workspace_config import workspace_config
 from ternexar.installer_profiles import profile_registry, ProfileStatus, handle_install_preview
 from ternexar.version_check import handle_version_check
 from ternexar.install_preflight import handle_install_preflight
+from ternexar.installer_execute import installer_executor
 from ternexar.ui import ui
 
 app = typer.Typer(
@@ -118,6 +119,14 @@ def install_preflight(
 ):
     """Run a safe installer readiness check before future real execution."""
     handle_install_preflight(tool)
+
+
+@app.command(name="install")
+def install(
+    tool: str = typer.Argument(..., help="The tool name to install (e.g., 'python3').")
+):
+    """Execute a verified installer profile after preflight and strong confirmation."""
+    installer_executor.execute_install(tool)
 
 
 @workspace_app.command("add")

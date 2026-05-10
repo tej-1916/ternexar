@@ -60,7 +60,7 @@ class UI:
             self.console.print(text)
 
         self.console.print(
-            "[dim]local-first AI command center • Ollama-ready • v1.7[/]\n"
+            "[dim]local-first AI command center • Ollama-ready • v2.0[/]\n"
         )
 
     def render_operator_routing_feedback(self, intent: str, route: str, safety: str):
@@ -749,7 +749,7 @@ class UI:
         elif data["status"] == "UNKNOWN_TOOL":
             self.error("Unknown tool. TERNEXAR does not have a profile for this request.")
         
-        self.console.print(f"\n[dim]Note: Future TERNEXAR v2.0 will enable confirmed execution for verified profiles.[/]\n")
+        self.console.print(f"\n[dim]Note: Use tx install "<tool>" for confirmed execution of verified profiles.[/]\n")
 
     def render_version_check_result(self, data: dict):
         """Render the results of a version check."""
@@ -863,7 +863,7 @@ class UI:
         if data["notes"]:
             self.console.print(f"[dim]Notes: {data['notes']}[/]")
 
-        self.console.print(f"\n[dim]Note: Future TERNEXAR v2.0 will enable confirmed execution for verified profiles.[/]\n")
+        self.console.print(f"\n[dim]Note: Use tx install "<tool>" for confirmed execution of verified profiles.[/]\n")
 
     def render_workspace_list(self, roots: list):
         """Render the list of custom workspace roots."""
@@ -923,6 +923,31 @@ class UI:
         else:
             self.console.print(f"\n[info]Multiple matches found.[/] Please be more specific or use [bold white]tx view <path>[/].")
         self.console.print("")
+
+    def render_install_execution_header(self, tool_name: str):
+        """Render a high-visibility header for confirmed installer execution."""
+        self.console.print("\n" + "=" * 80)
+        self.console.print(Align.center("[bold yellow]CONFIRMED INSTALLER EXECUTION[/]"))
+        self.console.print(Align.center(f"[bold white]Tool: {tool_name}[/]"))
+        self.console.print("=" * 80)
+        self.console.print(f"\n[info]ONLY VERIFIED INSTALLER PROFILE COMMANDS MAY RUN.[/]")
+        self.console.print(f"[info]NO ARBITRARY COMMANDS WILL BE EXECUTED.[/]\n")
+
+    def render_install_step(self, current: int, total: int, command: str):
+        """Render the status of a single installation step."""
+        self.console.print(f"\n[brand][STEP {current}/{total}][/] Executing: [bold white]{command}[/]")
+
+    def render_install_result(self, status, tool_name: str, message: str):
+        """Render the final result of an installation attempt."""
+        color = "bold green" if status.value == "SUCCESS" else "bold red"
+        if status.value == "CANCELLED":
+            color = "bold yellow"
+            
+        self.console.print("\n" + "=" * 80)
+        self.console.print(Align.center(f"[{color}]INSTALLATION {status.value}[/]"))
+        self.console.print(Align.center(f"[bold white]Tool: {tool_name}[/]"))
+        self.console.print("=" * 80)
+        self.console.print(f"\n{message}\n")
 
 
 ui = UI()

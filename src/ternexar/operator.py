@@ -19,6 +19,7 @@ from ternexar.analyze import handle_analyze
 from ternexar.installer_profiles import handle_install_preview
 from ternexar.version_check import handle_version_check
 from ternexar.install_preflight import handle_install_preflight
+from ternexar.installer_execute import installer_executor
 from prompt_toolkit.layout.processors import Processor, Transformation
 from prompt_toolkit.layout.utils import explode_text_fragments
 
@@ -131,8 +132,8 @@ def route_operator_input(text: str):
             handle_install_preflight(tool)
         elif intent == Intent.INSTALL_REQUEST:
             tool = router.extract_tool_name(text) or "unknown"
-            ui.render_operator_routing_feedback("INSTALL_REQUEST", f"tx install-preview {tool}", "Preview only")
-            handle_install_preview(tool)
+            ui.render_operator_routing_feedback("INSTALL_REQUEST", f"tx install {tool}", "Confirmed execution pipeline")
+            installer_executor.execute_install(tool)
         elif intent == Intent.REFUSE:
             ui.render_refusal(text, "Dangerous command or blocked pattern detected.")
         else:

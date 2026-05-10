@@ -52,6 +52,13 @@ class VersionCheckRegistry:
                 version_command=["npm", "--version"]
             ),
             VersionCheckProfile(
+                id="nmap",
+                name="nmap",
+                aliases=["nmap", "network mapper"],
+                executable="nmap",
+                version_command=["nmap", "--version"]
+            ),
+            VersionCheckProfile(
                 id="codex",
                 name="OpenAI Codex",
                 aliases=["codex", "openai codex"],

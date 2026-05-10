@@ -70,6 +70,24 @@ class ProfileRegistry:
                 }
             ),
             InstallerProfile(
+                id="nmap",
+                name="nmap",
+                aliases=["nmap", "network mapper"],
+                status=ProfileStatus.AVAILABLE,
+                global_warnings=["Ensure you have an active internet connection."],
+                platforms={
+                    "linux-apt": PlatformProfile(
+                        commands=[
+                            "sudo apt update",
+                            "sudo apt install nmap"
+                        ],
+                        verification="nmap --version",
+                        package_manager="apt",
+                        warnings=["Requires sudo privileges."]
+                    )
+                }
+            ),
+            InstallerProfile(
                 id="codex",
                 name="OpenAI Codex",
                 aliases=["codex", "openai codex"],
