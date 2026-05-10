@@ -749,7 +749,7 @@ class UI:
         elif data["status"] == "UNKNOWN_TOOL":
             self.error("Unknown tool. TERNEXAR does not have a profile for this request.")
         
-        self.console.print(f"\n[dim]Note: Use tx install "<tool>" for confirmed execution of verified profiles.[/]\n")
+        self.console.print('\n[dim]Note: Use tx install "<tool>" for confirmed execution of verified profiles.[/]\n')
 
     def render_version_check_result(self, data: dict):
         """Render the results of a version check."""
@@ -863,7 +863,7 @@ class UI:
         if data["notes"]:
             self.console.print(f"[dim]Notes: {data['notes']}[/]")
 
-        self.console.print(f"\n[dim]Note: Use tx install "<tool>" for confirmed execution of verified profiles.[/]\n")
+        self.console.print('\n[dim]Note: Use tx install "<tool>" for confirmed execution of verified profiles.[/]\n')
 
     def render_workspace_list(self, roots: list):
         """Render the list of custom workspace roots."""
