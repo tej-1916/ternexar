@@ -122,6 +122,9 @@ def route_operator_input(text: str):
         elif intent == Intent.ANALYZE:
             ui.render_operator_routing_feedback("ANALYZE", f"tx analyze \"{text}\"", "Safe fix mode")
             handle_analyze(text)
+        elif intent == Intent.RECOVER:
+            ui.render_operator_routing_feedback("RECOVER", f"tx recover \"{text}\"", "Diagnosis preview only")
+            handle_recover(text)
         elif intent == Intent.VERSION_CHECK:
             tool = router.extract_version_check_tool(text) or "unknown"
             ui.render_operator_routing_feedback("VERSION_CHECK", f"tx version-check {tool}", "Version check only")

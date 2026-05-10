@@ -161,6 +161,7 @@ class InstallerExecutor:
                 
                 if result.returncode != 0:
                     ui.error(f"Command failed with exit code {result.returncode}")
+                    ui.hint(f"Safe recovery may be available. Try: [bold white]tx recover \"<error summary>\"[/]")
                     audit_manager.log_event(
                         command=cmd_str,
                         risk_level="HIGH",

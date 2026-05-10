@@ -22,6 +22,7 @@ class Intent(Enum):
     SCAN = "SCAN"
     VIEW = "VIEW"
     ANALYZE = "ANALYZE"
+    RECOVER = "RECOVER"
     VERSION_CHECK = "VERSION_CHECK"
     INSTALL_PREFLIGHT = "INSTALL_PREFLIGHT"
     INSTALL_REQUEST = "INSTALL_REQUEST"
@@ -38,21 +39,30 @@ class Router:
         self.scan_keywords = {"scan", "inspect", "project type", "analyze project structure"}
         self.view_keywords = {"view", "show files", "list files", "project tree", "show project"}
         self.analyze_keywords = {"fix", "analyze", "debug", "broken", "error", "modulenotfounderror", "importerror"}
+        self.recover_keywords = {"recover", "diagnose", "why failed", "why did it fail", "fix error"}
 
     def classify_intent(self, text: str) -> Intent:
-        """Classify user intent based on heuristics and safety checks with v1.6 priority."""
+        """Classify user intent based on heuristics and safety checks with v2.1 priority."""
         clean_text = text.strip().lower()
         if not clean_text:
             return Intent.UNKNOWN
 
         # 1. Explicit dangerous/destructive/secret input (Existing Risk Engine)
+        # This MUST be first to block destructive requests before any other routing.
         analysis = risk_engine.analyze(text)
         if analysis.level in [RiskLevel.HIGH, RiskLevel.BLOCKED]:
             return Intent.REFUSE
 
-        # 2. Installer Preflight Request
-        if any(kw in clean_text for kw in self.preflight_keywords):
-            return Intent.INSTALL_PREFLIGHT
+        # 1b. Extra destructive patterns for recovery routing
+        destructive_patterns = ["rm -rf", "chmod 777", "cat .env", "wipe disk", "format disk"]
+        if any(p in clean_text for p in destructive_patterns):
+             return Intent.REFUSE
+
+        # 2. Recovery Request (v2.1)
+        if any(kw in clean_text for kw in self.recover_keywords):
+            return Intent.RECOVER
+
+        # 3. Installer Preflight Request
 
         # 3. Installer/System Install Request
         if "install " in clean_text:

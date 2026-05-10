@@ -12,7 +12,8 @@ from ternexar.config import CONFIG_FILE, config_manager
 from ternexar.audit import audit_manager
 from ternexar.do import handle_do
 from ternexar.analyze import handle_analyze
-from ternexar.operator import handle_operator
+from ternexar.recovery import handle_recover, handle_recover_file
+from ternexar.composer import handle_operator
 from ternexar.locator import locator
 from ternexar.workspace import workspace_manager
 from ternexar.setup_assistant import setup_assistant
@@ -170,6 +171,22 @@ def analyze(
 ):
     """Analyze a broken Python app or error and suggest safe patches."""
     handle_analyze(task)
+
+
+@app.command()
+def recover(
+    error: str = typer.Argument(..., help="The error text or log fragment to diagnose.")
+):
+    """Diagnose a system or project failure and show a safe recovery preview."""
+    handle_recover(error)
+
+
+@app.command(name="recover-file")
+def recover_file(
+    path: str = typer.Argument(..., help="The path to a safe log or error file to diagnose.")
+):
+    """Read a safe text file and diagnose its content for recovery."""
+    handle_recover_file(path)
 
 
 @app.command()

@@ -77,10 +77,10 @@ def test_router_extract_version_tool():
     assert router.extract_version_check_tool("is nodejs installed") == "nodejs"
     assert router.extract_version_check_tool("npm version") == "npm"
 
-@patch("ternexar.operator.handle_version_check")
+@patch("ternexar.composer.handle_version_check")
 def test_operator_routing_version_check(mock_handle):
     """Verify operator routes version check intent correctly."""
-    from ternexar.operator import route_operator_input
+    from ternexar.composer import route_operator_input
     
     with patch("ternexar.ui.ui.render_operator_routing_feedback"):
         route_operator_input("check python version")

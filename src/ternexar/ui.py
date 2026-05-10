@@ -949,5 +949,69 @@ class UI:
         self.console.print("=" * 80)
         self.console.print(f"\n{message}\n")
 
+    def render_recovery_report(self, report):
+        """Render the TERNEXAR v2.1 Safe Recovery Report."""
+        self.console.print(f"\n[brand]SAFE RECOVERY ENGINE[/]")
+        
+        # High-visibility header
+        self.console.print("\n" + "=" * 80)
+        self.console.print(Align.center("[bold red]RECOVERY PREVIEW ONLY - NO REPAIR APPLIED[/]"))
+        self.console.print("=" * 80 + "\n")
+
+        # Classification Table
+        table = Table(show_header=False, box=None, padding=(0, 2))
+        table.add_column("Key", style="dim cyan")
+        table.add_column("Value")
+
+        domain_color = {
+            "APT_PACKAGE_MANAGER": "bold blue",
+            "NPM_NODE": "bold green",
+            "PYTHON_PIP": "bold blue",
+            "GIT": "bold orange1",
+            "PERMISSION": "bold red",
+            "PORT_IN_USE": "bold yellow",
+            "FILESYSTEM_PATH": "cyan",
+            "BLOCKED_DESTRUCTIVE_REQUEST": "bold blink red"
+        }.get(report.profile.domain.value, "white")
+
+        table.add_row("Failure Domain", f"[{domain_color}]{report.profile.domain.value}[/]")
+        table.add_row("Recovery Profile", f"[bold white]{report.profile.id}[/]")
+        
+        if report.source_file:
+            table.add_row("Input Source", f"[dim]{report.source_file}[/]")
+        
+        status_color = "bold green" if report.status == "PREVIEW_ONLY" else "bold red"
+        table.add_row("Safety Status", f"[{status_color}]{report.status}[/]")
+        
+        self.console.print(Panel(table, border_style=CYAN, title="Diagnosis Summary"))
+
+        # Root Cause
+        self.console.print(f"\n[bold white]ROOT CAUSE EXPLANATION[/]")
+        self.console.print(Panel(
+            Text(report.profile.explanation),
+            border_style="dim white",
+            padding=(0, 1)
+        ))
+
+        # Repair Plan
+        self.console.print(f"\n[bold white]SAFE REPAIR PLAN (PREVIEW)[/]")
+        plan_text = ""
+        for i, step in enumerate(report.profile.repair_plan, 1):
+            plan_text += f"{i}. {step}\n"
+        
+        self.console.print(Panel(
+            Text(plan_text.strip()),
+            border_style=CYAN,
+            padding=(0, 1)
+        ))
+
+        # Diff Preview if available
+        if report.profile.diff_template:
+            self.render_diff_preview(report.profile.diff_template)
+
+        # Safety Reminder
+        self.console.print(f"\n[dim yellow]Next Steps:[/] Manual repair is required. Future versions may add confirmed repair apply.")
+        self.console.print(f"[dim]Audit Record: {report.safety_decision}[/]\n")
+
 
 ui = UI()
