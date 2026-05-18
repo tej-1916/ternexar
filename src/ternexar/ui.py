@@ -60,7 +60,7 @@ class UI:
             self.console.print(text)
 
         self.console.print(
-            "[dim]local-first AI command center • Ollama-ready • v2.0[/]\n"
+            "[dim]local-first AI command center • Ollama-ready • v2.1[/]\n"
         )
 
     def render_operator_routing_feedback(self, intent: str, route: str, safety: str):
