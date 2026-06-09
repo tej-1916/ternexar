@@ -1,0 +1,21 @@
+{
+  "project": "TERNEXAR",
+  "engine": "AutoFix Engine v1",
+  "errors": [
+    {
+      "type": "git_repository_not_found",
+      "command": "git push -u origin main --tags",
+      "error": "ERROR: Repository not found. fatal: Could not read from remote repository.",
+      "safe_checks": [
+        "git status",
+        "git remote -v",
+        "ssh -T git@github.com"
+      ],
+      "avoid": [
+        "git push --force",
+        "deleting .git",
+        "changing remote without checking"
+      ]
+    }
+  ]
+}
