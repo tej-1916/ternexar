@@ -27,3 +27,11 @@ backups/
 .env
 .env.*
 *.log
+
+# Caches and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
