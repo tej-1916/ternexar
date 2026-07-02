@@ -1,16 +1,56 @@
 [project]
 name = "ternexar"
 version = "2.1.0"
-description = "A premium, safety-first AI command center."
+description = "Autonomous execution engine for terminal workflows, agentic tasks, and developer automation."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = [
-    "typer[all]",
-    "rich",
-    "toml",
-    "requests",
-    "prompt_toolkit",
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
+keywords = ["cli", "terminal", "automation", "security", "agent"]
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "toml>=0.10.2",
+    "requests>=2.31.0",
+    "prompt_toolkit>=3.0.40",
+]
+
+[project.optional-dependencies]
+all = [
+    "pytest>=8.0.0",
+    "pytest-mock>=3.12.0",
+    "pytest-cov>=4.1.0",
+    "coverage>=7.4.0",
+    "ruff>=0.3.0",
+    "mypy>=1.9.0",
+    "types-requests",
+    "types-toml",
+    "pre-commit>=3.6.0",
+    "build",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-mock>=3.12.0",
+    "pytest-cov>=4.1.0",
+    "coverage>=7.4.0",
+    "ruff>=0.3.0",
+    "mypy>=1.9.0",
+    "types-requests",
+    "types-toml",
+    "pre-commit>=3.6.0",
+    "build",
+]
+
+[project.urls]
+Homepage = "https://github.com/tej-1916/ternexar"
+Repository = "https://github.com/tej-1916/ternexar"
+Issues = "https://github.com/tej-1916/ternexar/issues"
 
 [project.scripts]
 tx = "ternexar.main:main"
@@ -18,3 +58,6 @@ tx = "ternexar.main:main"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
