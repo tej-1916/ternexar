@@ -1,29 +1,39 @@
 import typer
+from typing import TYPE_CHECKING
 
-from ternexar.confirm import handle_confirm, confirm_engine
-from ternexar.gate import handle_gate, gate_engine
 from ternexar import __version__
-from ternexar.ask import handle_ask
-from ternexar.plan import handle_plan
-from ternexar.preview import handle_preview
-from ternexar.risk import risk_engine
-from ternexar.boot import boot_sequence
-from ternexar.config import CONFIG_FILE, config_manager
-from ternexar.audit import audit_manager
-from ternexar.do import handle_do
-from ternexar.analyze import handle_analyze
-from ternexar.recovery import handle_recover, handle_recover_file
-from ternexar.composer import handle_operator
-from ternexar.locator import locator
-from ternexar.workspace import workspace_manager
-from ternexar.setup_assistant import setup_assistant
-from ternexar.runner import runner_skeleton
-from ternexar.workspace_config import workspace_config
-from ternexar.installer_profiles import profile_registry, ProfileStatus, handle_install_preview
-from ternexar.version_check import handle_version_check
-from ternexar.install_preflight import handle_install_preflight
-from ternexar.installer_execute import installer_executor
-from ternexar.ui import ui
+
+if TYPE_CHECKING:
+    from ternexar.confirm import handle_confirm, confirm_engine
+    from ternexar.gate import handle_gate, gate_engine
+    from ternexar.ask import handle_ask
+    from ternexar.plan import handle_plan
+    from ternexar.preview import handle_preview
+    from ternexar.risk import risk_engine
+    from ternexar.boot import boot_sequence
+    from ternexar.config import CONFIG_FILE, config_manager
+    from ternexar.audit import audit_manager
+    from ternexar.do import handle_do
+    from ternexar.analyze import handle_analyze
+    from ternexar.recovery import handle_recover, handle_recover_file
+    from ternexar.composer import handle_operator
+    from ternexar.locator import locator
+    from ternexar.workspace import workspace_manager
+    from ternexar.setup_assistant import setup_assistant
+    from ternexar.runner import runner_skeleton
+    from ternexar.workspace_config import workspace_config
+    from ternexar.installer_profiles import profile_registry, ProfileStatus, handle_install_preview
+    from ternexar.version_check import handle_version_check
+    from ternexar.install_preflight import handle_install_preflight
+    from ternexar.installer_execute import installer_executor
+    from ternexar.ui import ui
+else:
+    # Lazy imports for runtime - only import when actually used
+    def _lazy_import(module_path: str):
+        import importlib
+        module_name, attr_name = module_path.rsplit('.', 1)
+        module = importlib.import_module(module_name)
+        return getattr(module, attr_name)
 
 app = typer.Typer(
     name="tx",
@@ -276,6 +286,7 @@ def doctor():
 @app.command()
 def version():
     """Show TERNEXAR version."""
+    from ternexar.ui import ui
     ui.info(f"TERNEXAR v{__version__}")
 
 
