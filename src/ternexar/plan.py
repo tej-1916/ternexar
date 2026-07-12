@@ -111,7 +111,7 @@ def handle_plan(
         combined_prompt += f"\n\n{STRENGTHENED_SAFETY_INSTRUCTION}"
     
     try:
-        with ui.status(f"Architecting plan with {model}...") as status:
+        with ui.status(f"Architecting plan with {model}..."):
             plan_text = ollama_client.generate(
                 model=model,
                 prompt=combined_prompt,

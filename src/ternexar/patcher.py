@@ -131,7 +131,7 @@ class Patcher:
 
         # Re-check diff line count
         diff_lines = diff.splitlines()
-        if len([l for l in diff_lines if l.startswith("+") or l.startswith("-")]) > MAX_PATCH_LINES:
+        if len([line for line in diff_lines if line.startswith("+") or line.startswith("-")]) > MAX_PATCH_LINES:
              return PatchResult(success=False, error="Patch too large (Max 100 lines changed).")
 
         try:

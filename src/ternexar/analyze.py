@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
 
+from ternexar.audit import audit_manager
 from ternexar.ollama_client import ollama_client
 from ternexar.patcher import patcher
 from ternexar.ui import ui
@@ -53,19 +54,9 @@ class Analyzer:
             result.safety_verdict = "REFUSED"
             result.reason = "Currently, TERNEXAR v1.2 only supports simple Python dependency fixes."
 
-        # 2. Optional Ollama Explanation
-        try:
-            # Use a very short prompt for explanation only
-            explanation_prompt = f"Explain this Python error briefly for a developer: {task}"
-            # Only if ollama is ready
-            # In a real app, we'd check config, but for now we'll attempt
-            # result.explanation = ollama.generate(explanation_prompt)
-            # Actually, the user said "Keep it optional". Let's provide a static explanation for now
-            # or try a quick call if we want, but let's stick to safe defaults.
-            if missing_module:
-                result.explanation = f"The application is trying to import '{missing_module}', but it's not installed in the current environment or listed in requirements.txt."
-        except Exception:
-            pass
+        # 2. Optional static explanation
+        if missing_module:
+            result.explanation = f"The application is trying to import '{missing_module}', but it's not installed in the current environment or listed in requirements.txt."
 
         return result
 
@@ -126,7 +117,6 @@ class Analyzer:
         
         return None
 
-from ternexar.audit import audit_manager
 
 def handle_analyze(task: str):
     """Orchestrate the analysis and patching workflow."""

@@ -47,7 +47,7 @@ def handle_ask(
     ui.info(f"TERNEXAR ASK • [dim]model: {model}[/]")
     
     try:
-        with ui.status(f"Thinking with {model}...") as status:
+        with ui.status(f"Thinking with {model}..."):
             response_text = ollama_client.generate(
                 model=model,
                 prompt=prompt,
